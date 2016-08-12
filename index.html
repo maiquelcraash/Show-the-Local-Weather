@@ -4,19 +4,54 @@
     <meta charset="UTF-8">
     <title>Title</title>
     <link href='https://fonts.googleapis.com/css?family=Signika' rel='stylesheet' type='text/css'>
-    <link href="normalize.css" rel="stylesheet" type="text/css">
     <link href="main.css" rel="stylesheet" type="text/css">
-    <script src="jquery-2.2.4.js"></script>
+    <script src="lib/jquery-2.2.4.js"></script>
+    <script src="lib/skycons.js"></script>
     <script src="main.js"></script>
 </head>
 <body>
     <div class="content">
         <h1>Lets check the weather now:</h1>
         <h2 id="location"></h2>
-        <div id="temperature"></div>
-        <div id="status"></div>
-        <div id="humidity"</div>
+        <div class="weather">
+            <div class="box" id="temperature"></div>
+            <div class="empty"></div>
+            <div class="box" id="status"></div>
+            <div class="empty"></div>
+            <div class="box" id="humidity"></div>
+        </div>
+        <div id="nextdays" class="weather">
+            <table>
+                <tr>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                </tr>
+                <tr id="condition">
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr id="low">
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr id="high">
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </table>
+        </div>
     </div>
-    
 </body>
 </html>

@@ -18,6 +18,8 @@
 		humidity: null
 	};
 
+	var nextdays = [];
+
 	$(document).ready(function () {
 		console.log("in");
 		getWeather();
@@ -57,8 +59,6 @@
 	}
 
 	function setCurrentWeather(data) {
-		console.log(JSON.stringify(data));
-		console.log(data);
 
 		var weatherItem = data.query.results.channel.item;
 		var location = data.query.results.channel.location;
@@ -67,14 +67,70 @@
 		weather.status = weatherItem.condition.text;
 		weather.humidity = data.query.results.channel.atmosphere.humidity;
 
+		var days = weatherItem.forecast;
+
+		days.forEach(function (item) {
+
+			var newDay = {
+				day: item.day,
+				high: item.high,
+				low: item.low,
+				text: item.text
+			};
+			nextdays.push(newDay);
+		});
+
+		console.log(nextdays);
+
+
 		initComponents();
 	}
 
 	function initComponents() {
 		$('#location').html(weather.location);
 		$('#temperature').html(weather.temperature + " ºC");
-		$('#status').html(weather.status);
+		//$('#status').html(weather.status);
+		$('#status').append(getIcon());
+
+
 		$('#humidity').html(weather.humidity + "%");
+
+		var titleCells = $('#nextdays').find('th');
+
+		for (var i = 0; i < titleCells.length; i++) {
+			$(titleCells[i]).html(nextdays[i+1].day);
+		}
+
+		var conditionCells = $('#nextdays').find('#condition td');
+
+		for (var i = 0; i < titleCells.length; i++) {
+			$(conditionCells[i]).html(nextdays[i+1].text);
+		}
+
+		var lowCells = $('#nextdays').find('#low td');
+
+		for (var i = 0; i < titleCells.length; i++) {
+			$(lowCells[i]).html(nextdays[i+1].low);
+		}
+
+		var highCells = $('#nextdays').find('#high td');
+
+		for (var i = 0; i < titleCells.length; i++) {
+			$(highCells[i]).html(nextdays[i+1].high);
+		}
+	}
+
+	function getIcon(conditionCode) {
+		var sunny = [];
+
+
+		var skycons = new Skycons({"color": "black"});
+		var canvas = document.createElement("canvas");
+		canvas.addClass("status");
+
+		skycons.add(canvas, Skycons.PARTLY_CLOUDY_DAY);
+
+		return canvas;
 	}
 
 }());
