@@ -4,7 +4,7 @@
 
 (function () {
 	"use strict";
-	var currentWeather = null;
+	var celcius = true;
 
 	var position = {
 		latitude: null,
@@ -21,7 +21,6 @@
 	var nextdays = [];
 
 	$(document).ready(function () {
-		console.log("in");
 		getWeather();
 	});
 
@@ -32,7 +31,6 @@
 			navigator.geolocation.getCurrentPosition(function (pos) {
 				position.latitude = pos.coords.latitude;
 				position.longitude = pos.coords.longitude;
-				console.log(position);
 
 				var url = "https://simple-weather.p.mashape.com/weatherdata?lat=";
 				url += position.latitude + "&lng=" + position.longitude;
@@ -64,7 +62,7 @@
 		var location = data.query.results.channel.location;
 		weather.location = location.city + " - " + location.region;
 		weather.temperature = weatherItem.condition.temp;
-		weather.status = weatherItem.condition.text;
+		weather.status = weatherItem.condition.code;
 		weather.humidity = data.query.results.channel.atmosphere.humidity;
 
 		var days = weatherItem.forecast;
@@ -75,62 +73,142 @@
 				day: item.day,
 				high: item.high,
 				low: item.low,
-				text: item.text
+				status: item.code
 			};
 			nextdays.push(newDay);
 		});
 
-		console.log(nextdays);
-
-
 		initComponents();
+
+		$("#toggle-temp").click(toggleTemp);
+
+
 	}
 
 	function initComponents() {
+		//locations info
 		$('#location').html(weather.location);
-		$('#temperature').html(weather.temperature + " ºC");
-		//$('#status').html(weather.status);
-		$('#status').append(getIcon());
+
+		//temperature info
+		var temperatureCell = $('#temperature');
+		temperatureCell.html(weather.temperature);
+		var a = document.createElement("a");
+		$(a).html(" ºC");
+		$(a).attr("href", "#");
+		$(a).attr("id", "toggle-temp");
+		temperatureCell.append(a);
+
+		//status graphics
+		$('#status').append(getIcon(weather.status));
 
 
+		//humidity info
 		$('#humidity').html(weather.humidity + "%");
 
-		var titleCells = $('#nextdays').find('th');
+		//nextdays populate
+		var cells = $('#nextdays');
+		var titleCells = cells.find('th');
 
 		for (var i = 0; i < titleCells.length; i++) {
-			$(titleCells[i]).html(nextdays[i+1].day);
+			$(titleCells[i]).html(nextdays[i + 1].day);
 		}
 
-		var conditionCells = $('#nextdays').find('#condition td');
+		var conditionCells = cells.find('#condition td');
 
 		for (var i = 0; i < titleCells.length; i++) {
-			$(conditionCells[i]).html(nextdays[i+1].text);
+			$(conditionCells[i]).append(getIcon(nextdays[i + 1].status));
 		}
 
-		var lowCells = $('#nextdays').find('#low td');
+		var lowCells = cells.find('#low td');
 
 		for (var i = 0; i < titleCells.length; i++) {
-			$(lowCells[i]).html(nextdays[i+1].low);
+			$(lowCells[i]).html(nextdays[i + 1].low);
 		}
 
-		var highCells = $('#nextdays').find('#high td');
+		var highCells = cells.find('#high td');
 
 		for (var i = 0; i < titleCells.length; i++) {
-			$(highCells[i]).html(nextdays[i+1].high);
+			$(highCells[i]).html(nextdays[i + 1].high);
 		}
+
+		setBackgroundByTemperature(weather.temperature);
 	}
 
 	function getIcon(conditionCode) {
-		var sunny = [];
+		conditionCode = parseInt(conditionCode);
 
+		var sunny = [0, 1, 2, 3, 4, 6, 7, 8, 9, 10, 11, 12, 17, 23, 31, 32, 33, 34, 36];
+		var cloudy = [18, 19, 20, 21, 22, 24, 25, 26, 27, 28];
+		var rain = [35, 37, 38, 39, 40, 45];
+		var cloudySun = [29, 30, 44, 47];
+		var snow = [5, 13, 14, 15, 16, 41, 42, 43];
 
-		var skycons = new Skycons({"color": "black"});
+		var condition;
+
+		if (sunny.includes(conditionCode)) {
+
+			condition = Skycons.CLEAR_DAY;
+		}
+		else if (rain.includes(conditionCode)) {
+
+			condition = Skycons.RAIN;
+		}
+		else if (cloudy.includes(conditionCode)) {
+			condition = Skycons.CLOUDY;
+		}
+		else if (snow.includes(conditionCode)) {
+			condition = Skycons.SNOW;
+		}
+		else if (cloudySun.includes(conditionCode)) {
+			condition = Skycons.PARTLY_CLOUDY_DAY;
+		}
+
+		var skycons = new Skycons({"color": "white"});
 		var canvas = document.createElement("canvas");
-		canvas.addClass("status");
+		$(canvas).addClass("status");
 
-		skycons.add(canvas, Skycons.PARTLY_CLOUDY_DAY);
+		skycons.add(canvas, condition);
+		skycons.play();
 
 		return canvas;
 	}
 
+	function setBackgroundByTemperature(temperature) {
+		var imageUrl = "";
+
+		if (temperature < 0) {
+			imageUrl = "https://wallpaperscraft.com/image/winter_spruce_branches_snow_glare_99412_1920x1080.jpg";
+		}
+		else if (temperature < 8) {
+			imageUrl = "https://wallpaperscraft.com/image/forest_mountains_sky_autumn_trees_108106_1920x1200.jpg";
+		}
+		else if (temperature < 20) {
+			imageUrl = "https://wallpaperscraft.com/image/spring_tree_bush_flower_field_fence_48020_1920x1200.jpg";
+		}
+		else {
+			imageUrl = "https://wallpaperscraft.com/image/summer_trees_beach_river_81887_1920x1080.jpg";
+		}
+
+		$('body').css("background-image", "url(" + imageUrl + ")");
+
+	}
+
+	function toggleTemp(e) {
+		var a = $(e.currentTarget);
+
+		if (celcius){
+			a.html(" ºF");
+			celcius = false;
+			$('#temperature').html(weather.temperature * 1.8 + 32).append(a);
+		}
+		else {
+			a.html(" ºC");
+			celcius = true;
+			$('#temperature').html(weather.temperature).append(a);
+		}
+
+		$("#toggle-temp").click(toggleTemp);
+	}
+
 }());
+
