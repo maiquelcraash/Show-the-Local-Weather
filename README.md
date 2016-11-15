@@ -1,10 +1,9 @@
-Tarefa executada a partir do Free Code Camp, pelo endereço:
-https://www.freecodecamp.com/challenges/show-the-local-weather
+Nice Weather Web Page
 
-Exemplo:
-http://codepen.io/FreeCodeCamp/full/bELRjV
+DEMO: https://codepen.io/maiquelcraash/full/OXdAWK/
+(The demo on CodePen do not work on Google Chrome, because it requires https protocol to use the GeoLocation system).
 
-APIs Extras utilizadas:
+Extra APIs
 - Skyicons
 https://darkskyapp.github.io/skycons/
 
